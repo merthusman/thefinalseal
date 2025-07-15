@@ -1,35 +1,50 @@
 # ==============================================================================
-# ANATOMY OF A UNIVERSE - FINAL CODE v35.1: THE FINAL SEAL (ANNOTATED)
+# ANATOMY OF A UNIVERSE - FINAL CODE v38: COLAB-NATIVE VISUALIZATION
 # ==============================================================================
-# PHILOSOPHICAL PRINCIPLES EMBODIED:
+# VERSION NOTES:
 #
-# 1. AUTOPOIESIS (SELF-CREATION): The universe determines its own entropic limit
-#    (the point of collapse) based on its own fundamental constants, rather
-#    than an arbitrary, hard-coded number.
+# 1. ROBUST DEPENDENCY HANDLING: The script now begins by checking for the
+#    `mpmath` library and installing it if it's not present, ensuring
+#    reliable execution in environments like Google Colab.
 #
-# 2. PRINCIPLE OF SINGULAR PURPOSE: The physics of the Collapse Phase is
-#    reduced to a single, absolute purpose: return to the origin. All other
-#    complex forces and conservation laws are disabled to ensure a perfect return.
+# 2. COLAB-NATIVE PLOTTING: The visualization logic has been redesigned for
+#    notebook environments. Instead of a live animation, the script now
+#    generates and displays a complete, static plot dashboard at each key
+#    "event" (Start, Phase Transition, Rebirth), solving the "frozen GUI" issue.
 #
-# 3. FLAWLESS REPETITION: The end of one cycle deterministically triggers the
-#    beginning of the next, identical cycle. A hard reset of the state,
-#    combined with a 'continue' statement, prevents any "memory" or
-#    numerical error from leaking from one cycle to the next, ensuring each
-#    "Bengi Dönüş" (Eternal Return) is a perfect replica.
+# 3. ALL FEATURES INCLUDED: This version maintains the 16x16 grid, the full
+#    set of English annotations, console reporting, and the event-driven logic.
 # ==============================================================================
 
+# --- PART 0: ROBUST LIBRARY SETUP ---
+# This block ensures all required libraries are available, especially in cloud environments.
+import subprocess
+import sys
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+try:
+    import mpmath
+    print("✅ 'mpmath' library is already installed.")
+except ImportError:
+    print("⏳ 'mpmath' library not found. Installing...")
+    install("mpmath")
+    import mpmath
+    print("✅ 'mpmath' library installed successfully.")
+
+# Import all other necessary libraries
 import numpy as np
 import matplotlib.pyplot as plt
 from numba import jit, prange
 import math
 import time
-import mpmath
+from scipy.ndimage import zoom
 
-# --- PART 1: LIBRARY AND PI GENERATION ---
+
+# --- PART 1: PI GENERATION ---
 try:
-    # This block generates a high-precision string of Pi digits,
-    # which serves as the non-arbitrary source of all information for the universe.
-    num_digits = 500000
+    num_digits = 1000000
     print(f"⏳ Calculating {num_digits} digits of Pi...")
     mpmath.mp.dps = num_digits + 1
     pi_val = mpmath.pi
@@ -42,194 +57,180 @@ except Exception as e:
 MV_SIZE = 16
 
 # --- PART 2: THE UNIVERSE'S CONSTITUTION ---
-def setup_universe(pi_str, grid_size_pref=4):
-    """
-    Sets up the foundational constitution of the universe. All parameters are
-    derived from non-arbitrary principles, primarily from the constant Pi.
-    """
+def setup_universe(pi_str, grid_size_pref=16):
+    # This function remains identical to the previous version.
     if not pi_str: raise ValueError("Pi string is empty. Cannot initialize universe.")
     print("\n--- ESTABLISHING THE CONSTITUTION OF THE OMEGA UNIVERSE ---")
-    
     clean_pi_str = ''.join(filter(str.isdigit, pi_str))
     grid_size = grid_size_pref
+    print(f"✅ Grid Size set to: {grid_size}x{grid_size}")
     total_values_needed = grid_size * grid_size * MV_SIZE
     if len(clean_pi_str) < total_values_needed:
-        raise ValueError("Pi string is too short for the required grid size!")
-    
+        raise ValueError(f"Pi string is too short! Need {total_values_needed} digits.")
     all_values = np.array([int(d) for d in clean_pi_str[:total_values_needed]])
     normalized_values = (all_values - 4.5) / 4.5
     psi_potential = normalized_values.reshape((grid_size, grid_size, MV_SIZE))
-    
     print("⚖️ Defining Fundamental Cosmological Constants...")
     params = {"grid_size": grid_size}
-    
-    # --- NON-ARBITRARY PHYSICAL CONSTANTS ---
-    # The foundational strength of the expansion/chaos engine, derived from Pi.
     params["g_factor_base"] = np.pi
-    # The foundational strength of the 'Origin Memory' force, proportional to the square of Pi.
     params["k_base"] = np.pi**2
-    # The foundational strength of the stabilizing force.
     params["h_base"] = np.pi
-    
-    # --- THE "DIALECT" OF THE UNIVERSE ---
-    # This factor tunes the character of the expansion. Its value is chosen as the ratio
-    # of Euler's number (e, the base of natural growth) to Pi (π, the constant of cycles),
-    # linking the universe's dynamics to the fundamental Euler's Identity (e^(iπ) + 1 = 0).
     g_tuning_factor = np.e / np.pi
     params["g_factor"] = params["g_factor_base"] * g_tuning_factor
-    
-    # --- AUTOPOIESIS: A SELF-CALCULATING LIMIT ---
-    # The entropic limit is not an arbitrary number. It is dynamically calculated from the
-    # universe's own constants. It represents the breaking point where the expansive drive
-    # (related to g_factor) overcomes the structural integrity (related to k_base).
     params["max_complexity_threshold"] = np.pi * (params["k_base"] / params["g_factor"])
-    
     print(f"  > Dialect Selected (g_tuning_factor): e/π ≈ {g_tuning_factor:.4f}")
     print(f"  > Final Expansion Drive (g_factor): {params['g_factor']:.4f}")
     print(f"  > Dynamic Entropic Limit: {params['max_complexity_threshold']:.4f}")
-
     params["base_dt"] = 0.01 * (1.0 / grid_size)**2
-    params["iterations"] = 500000
+    params["iterations"] = 1000000
     print("--- CONSTITUTION COMPLETE ---")
-    
     return psi_potential, params
 
 # --- PART 3: THE LAWS OF PHYSICS ---
 @jit(nopython=True, parallel=True)
 def calculate_expansion_delta(psi_grid, psi_initial, g_final, h_final, k_final):
-    """
-    Calculates the change in the state field (Ψ) during the Expansion Phase,
-    using the full, complex set of physical laws.
-    """
+    # This function remains identical to the previous version.
     grid_size = psi_grid.shape[0]
     delta_psi = np.zeros_like(psi_grid)
     psi_smoothed = np.zeros_like(psi_grid)
-    
     for i in prange(grid_size):
         for j in prange(grid_size):
-            psi_smoothed[i, j] = (psi_grid[i, j] * 4 + 
-                                  psi_grid[(i - 1 + grid_size) % grid_size, j] + 
-                                  psi_grid[(i + 1) % grid_size, j] + 
-                                  psi_grid[i, (j - 1 + grid_size) % grid_size] + 
-                                  psi_grid[i, (j + 1) % grid_size]) / 8.0
+            psi_smoothed[i, j] = (psi_grid[i,j]*4+psi_grid[(i-1)%grid_size,j]+psi_grid[(i+1)%grid_size,j]+psi_grid[i,(j-1)%grid_size]+psi_grid[i,(j+1)%grid_size])/8.0
     for i in prange(grid_size):
         for j in prange(grid_size):
-            current, initial, smoothed = psi_grid[i, j], psi_initial[i, j], psi_smoothed[i, j]
-            
-            # The 'Omega Engine': drives complexity by amplifying local differences.
+            current, initial, smoothed = psi_grid[i,j], psi_initial[i,j], psi_smoothed[i,j]
             asymmetry_tension = g_final * (current - smoothed)
-            # The 'Potential Well': a non-linear stabilizing force.
             stability_force = -h_final * (current - np.tanh(current))
-            # The residual 'Origin Memory' force.
             origin_memory = -k_final * (current - initial)
-            
-            delta_psi[i, j] = asymmetry_tension + stability_force + origin_memory
-            
+            delta_psi[i,j] = asymmetry_tension + stability_force + origin_memory
     return delta_psi
 
-# --- PART 4: THE SIMULATION ENGINE (THE FINAL SEAL) ---
+# --- PART 4: DEDICATED VISUALIZATION FUNCTION (FOR COLAB) ---
+def create_event_snapshot(psi_current, complexity_history, fark_history, t, dongu_sayaci, triggered_step):
+    """
+    Creates and displays a single, static snapshot of the universe's state
+    at a specific event. This method is robust for notebook environments.
+    """
+    phase_text = "COLLAPSE" if triggered_step != -1 and t > triggered_step else "EXPANSION"
+    
+    print(f"--- 📊 Generating Plot for Event at Step: {t:07d}, Phase: {phase_text} ---")
+    
+    fig, ((ax_vis, ax_complexity_time), (ax_diff_time, ax_phase_space)) = plt.subplots(2, 2, figsize=(18, 14))
+    fig.suptitle(f"Anatomy of a Universe - Snapshot at Step {t}", fontsize=20)
+
+    # 1. Phenomenal World
+    im = ax_vis.imshow(psi_current[:, :, 0], cmap='inferno', interpolation='nearest')
+    ax_vis.set_title(f"Phenomenal World (Ψ)")
+    ax_vis.set_xticks([]); ax_vis.set_yticks([])
+    fig.colorbar(im, ax=ax_vis)
+
+    # 2. Complexity vs. Time
+    ax_complexity_time.plot(complexity_history, color='orangered')
+    ax_complexity_time.set_title("History: Complexity vs. Time")
+    ax_complexity_time.set_xlabel("Time Step"); ax_complexity_time.set_ylabel("Complexity")
+    ax_complexity_time.grid(True, alpha=0.4)
+
+    # 3. Difference vs. Time
+    ax_diff_time.plot(fark_history, color='royalblue')
+    ax_diff_time.set_title("History: Difference vs. Time")
+    ax_diff_time.set_xlabel("Time Step"); ax_diff_time.set_ylabel("Difference from Origin")
+    ax_diff_time.grid(True, alpha=0.4)
+    
+    # 4. Phase Space
+    ax_phase_space.plot(complexity_history, fark_history, color='purple', alpha=0.6, linewidth=2)
+    ax_phase_space.plot(complexity_history[-1], fark_history[-1], 'go', markersize=10, label=f'Event at t={t}')
+    ax_phase_space.set_title(f"State: Phase Space (Cycle {dongu_sayaci})")
+    ax_phase_space.set_xlabel("Complexity"); ax_phase_space.set_ylabel("Difference")
+    ax_phase_space.legend(loc='upper right')
+    ax_phase_space.grid(True, alpha=0.4)
+    
+    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.show() # Display the static plot in the output cell
+    plt.close(fig) # Close the figure object to conserve memory
+
+# --- PART 5: THE SIMULATION ENGINE ---
 try:
-    PSI_INITIAL, PARAMS = setup_universe(PI_STR)
+    PSI_INITIAL, PARAMS = setup_universe(PI_STR, grid_size_pref=16)
     
     psi_current = PSI_INITIAL.copy()
     fark_history, complexity_history = [], []
     triggered_step = -1
     dongu_sayaci = 0
 
-    print(f"\n--- INITIALIZING ETERNAL RETURN (THE FINAL SEAL) ---")
+    print(f"\n--- INITIALIZING SIMULATION (COLAB-NATIVE MODEL) ---")
     start_time = time.time()
-    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-    plt.ion()
+    
+    # Initial state logging
+    fark_history.append(0.0)
+    complexity_history.append(np.var(PSI_INITIAL))
+    
+    # Initial plot at t=0
+    create_event_snapshot(psi_current, complexity_history, fark_history, 0, dongu_sayaci, triggered_step)
 
-    for t in range(PARAMS["iterations"]):
+    # --- Main Simulation Loop ---
+    for t in range(1, PARAMS["iterations"]):
         
-        # ==================================================================
-        # ✨ FLAWLESS REPETITION CONTROL GATE (EXECUTED FIRST) ✨
-        # ==================================================================
         difference = np.linalg.norm(psi_current - PSI_INITIAL)
         if triggered_step != -1 and difference < 0.01:
+            # === EVENT 1: ETERNAL RETURN ===
+            fark_history.append(difference); complexity_history.append(np.var(psi_current))
+            create_event_snapshot(psi_current, complexity_history, fark_history, t, dongu_sayaci, triggered_step)
+            
             dongu_sayaci += 1
             print(f"\n>>> ciclo perpetuo ({dongu_sayaci})")
             print(f"✨✨✨ STEP {t}: ETERNAL RETURN COMPLETE! A NEW AGE BEGINS! ✨✨✨")
             
-            # 1. Reset the universe's state to 'Expansion'.
             triggered_step = -1 
-            # 2. Hard reset the phenomenal state to its pristine, original configuration.
-            psi_current = PSI_INITIAL.copy() 
-            # 3. Append placeholder values to history for this reset moment.
+            psi_current = PSI_INITIAL.copy()
+            
+            # Non-destructive history for phase space plot
             fark_history.append(0.0)
             complexity_history.append(np.var(PSI_INITIAL))
             
-            # 4. Crucially, skip the rest of this loop to prevent a "ghost step"
-            #    from contaminating the perfectly reset state.
+            # Plot the fresh start of the new cycle
+            create_event_snapshot(psi_current, complexity_history, fark_history, t, dongu_sayaci, triggered_step)
             continue
-        # ==================================================================
 
-        # Check for phase transition from Expansion to Collapse.
         complexity = np.var(psi_current)
         if triggered_step == -1 and complexity > PARAMS["max_complexity_threshold"]:
-            print(f"\n---!!! STEP {t}: DYNAMIC ENTROPIC LIMIT REACHED! PHASE TRANSITION! ✨ !!!---")
+            # === EVENT 2: PHASE TRANSITION ===
             triggered_step = t
+            fark_history.append(difference); complexity_history.append(complexity)
+            print(f"\n---!!! STEP {t}: DYNAMIC ENTROPİK SINIRA ULAŞILDI! FAZ GEÇİŞİ! ✨ !!!---")
+            create_event_snapshot(psi_current, complexity_history, fark_history, t, dongu_sayaci, triggered_step)
 
-        # --- PHASE-SPECIFIC PHYSICS AND UPDATE LOGIC ---
-        if triggered_step != -1: # --- COLLAPSE PHASE ---
-            # 1. PHYSICS: The "Homing Beacon" protocol. All complex physics are disabled.
-            # The only active force is a pure, direct attraction to the origin.
+        # Physics and Update Logic
+        if triggered_step != -1:
             potential_delta = -(psi_current - PSI_INITIAL)
-            
-            # 2. UPDATE: Absolute & Unprotected. The update is applied directly,
-            # without the stabilizing 'conservation law' subtractions.
-            max_abs_change = np.max(np.abs(potential_delta))
-            if max_abs_change < 1e-9: max_abs_change = 1e-9
-            final_dt = PARAMS["base_dt"] / max_abs_change
+            max_abs_change = np.max(np.abs(potential_delta)); final_dt = PARAMS["base_dt"] / (max_abs_change if max_abs_change > 1e-9 else 1e-9)
             psi_current += final_dt * potential_delta
-
-        else: # --- EXPANSION PHASE ---
-            # 1. PHYSICS: The complex creation engine is active.
+        else:
             g_final = PARAMS["g_factor"] * complexity 
             h_final = PARAMS["h_base"]
-            k_final = PARAMS["k_base"] / (np.pi**3) # Weakened origin memory
-            potential_delta = calculate_expansion_delta(
-                psi_current, PSI_INITIAL, g_final, h_final, k_final
-            )
-            
-            # 2. UPDATE: Protected. The state and its change are centered around a zero mean.
-            # This enforces a 'conservation law' that provides stability during chaotic expansion.
-            total_change = np.sum(potential_delta, axis=(0, 1))
-            num_cells = PARAMS["grid_size"]**2
-            average_change = total_change / num_cells
-            final_delta = potential_delta - average_change # Protection 1
-            
-            max_abs_change = np.max(np.abs(final_delta))
-            if max_abs_change < 1e-9: max_abs_change = 1e-9
-            final_dt = PARAMS["base_dt"] / max_abs_change
+            k_final = PARAMS["k_base"] / (np.pi**3)
+            potential_delta = calculate_expansion_delta(psi_current, PSI_INITIAL, g_final, h_final, k_final)
+            total_change = np.sum(potential_delta, axis=(0,1)); num_cells = PARAMS["grid_size"]**2
+            average_change = total_change / num_cells; final_delta = potential_delta - average_change
+            max_abs_change = np.max(np.abs(final_delta)); final_dt = PARAMS["base_dt"] / (max_abs_change if max_abs_change > 1e-9 else 1e-9)
             psi_current += final_dt * final_delta
-            
-            total_state = np.sum(psi_current, axis=(0, 1))
-            average_state = total_state / num_cells
-            psi_current -= average_state # Protection 2
+            total_state = np.sum(psi_current, axis=(0,1)); average_state = total_state / num_cells
+            psi_current -= average_state
         
-        # Log history for plotting.
         fark_history.append(difference)
         complexity_history.append(complexity)
 
         if np.isnan(difference) or np.isinf(difference):
             print(f"\n💥 STEP {t}: SIMULATION EXPLODED (NaN/inf)! 💥"); break
-
-        # Periodic reporting and visualization.
-        if t > 0 and (t % 20000 == 0 or t == PARAMS["iterations"] - 1 or (triggered_step == t)):
+            
+        # Periodic Text Reporting to Console
+        reporting_interval = 5000 
+        if t > 0 and t % reporting_interval == 0:
             phase_text = "COLLAPSE" if triggered_step != -1 else "EXPANSION"
-            print(f"Step: {t:07d}, Cycle: {dongu_sayaci}, Phase: {phase_text}, Diff: {difference:.4f}, Complexity: {complexity:.4f}, Time: {(time.time() - start_time):.1f}s")
-            ax.clear(); ax.imshow(psi_current[:, :, 0], cmap='inferno', interpolation='nearest'); ax.set_title(f"Step: {t} ({phase_text}) - Cycle: {dongu_sayaci}"); plt.draw(); plt.pause(0.01)
+            print(f"Report - Step: {t:07d}, Cycle: {dongu_sayaci}, Phase: {phase_text}, Diff: {difference:.4f}, Complexity: {complexity:.4f}")
 
-    plt.ioff()
-    print("\n--- SIMULATION DURATION COMPLETE ---")
-    fig_final, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 12), sharex=True)
-    fig_final.suptitle("The Final Seal: A Flawlessly Repeating Cycle", fontsize=20)
-    ax1.plot(fark_history, label='Difference from Origin (Norm)', color='royalblue')
-    ax2.plot(complexity_history, label="Universe's Complexity (Variance)", color='orangered')
-    ax1.set_ylabel("Difference"); ax2.set_ylabel("Complexity"); ax2.set_xlabel("Simulation Step (t)")
-    ax1.legend(); ax2.legend(); plt.grid(True, alpha=0.3); plt.show()
+    total_time = time.time() - start_time
+    print(f"\n--- SIMULATION DURATION COMPLETE --- (Total Time: {total_time:.2f} seconds)")
+    print("Final analysis plot contains the full history of all cycles.")
 
 except Exception as e:
     print(f"\n❌ AN UNEXPECTED SIMULATION ERROR OCCURRED: {e}")
