@@ -1,85 +1,109 @@
 # ==============================================================================
-# BİR EVRENİN ANATOMİSİ - NİHAİ KOD v35: "NİHAİ MÜHÜR" (AÇIKLAMALI VERSİYON)
+# ANATOMY OF A UNIVERSE - FINAL CODE v35.1: THE FINAL SEAL (ANNOTATED)
 # ==============================================================================
-# [EN] THE FINAL CODE v35: "THE FINAL SEAL" (ANNOTATED VERSION)
-# THIS IS THE PHILOSOPHICALLY AND TECHNICALLY COMPLETE, FINAL STATE OF THE PROJECT.
-# ALL PRINCIPLES ARE UNIFIED INTO A SINGLE, FLAWLESS STRUCTURE.
-# THE UNIVERSE IS NOW IN A PERFECT, ETERNAL CYCLE, GOVERNED BY ITS OWN LAWS.
+# PHILOSOPHICAL PRINCIPLES EMBODIED:
+#
+# 1. AUTOPOIESIS (SELF-CREATION): The universe determines its own entropic limit
+#    (the point of collapse) based on its own fundamental constants, rather
+#    than an arbitrary, hard-coded number.
+#
+# 2. PRINCIPLE OF SINGULAR PURPOSE: The physics of the Collapse Phase is
+#    reduced to a single, absolute purpose: return to the origin. All other
+#    complex forces and conservation laws are disabled to ensure a perfect return.
+#
+# 3. FLAWLESS REPETITION: The end of one cycle deterministically triggers the
+#    beginning of the next, identical cycle. A hard reset of the state,
+#    combined with a 'continue' statement, prevents any "memory" or
+#    numerical error from leaking from one cycle to the next, ensuring each
+#    "Bengi Dönüş" (Eternal Return) is a perfect replica.
 # ==============================================================================
 
-# BÖLÜM 0, 1: KÜTÜPHANELER VE Pİ'NİN ÜRETİMİ
-# [EN] SECTION 0, 1: LIBRARIES AND PI GENERATION
-import mpmath
 import numpy as np
 import matplotlib.pyplot as plt
 from numba import jit, prange
 import math
 import time
+import mpmath
 
+# --- PART 1: LIBRARY AND PI GENERATION ---
 try:
-    num_digits = 10000
-    print(f"⏳ {num_digits} basamak π hesaplanıyor...")
+    # This block generates a high-precision string of Pi digits,
+    # which serves as the non-arbitrary source of all information for the universe.
+    num_digits = 500000
+    print(f"⏳ Calculating {num_digits} digits of Pi...")
     mpmath.mp.dps = num_digits + 1
     pi_val = mpmath.pi
     PI_STR = str(pi_val)[2:]
-    print(f"✅ Başarıyla {len(PI_STR)} basamak π üretildi.")
+    print(f"✅ Successfully generated {len(PI_STR)} digits of Pi.")
 except Exception as e:
     PI_STR = ""
-    print(f"❌ π üretilirken hata oluştu: {e}")
+    print(f"❌ An error occurred during Pi generation: {e}")
 
 MV_SIZE = 16
 
-# BÖLÜM 2: EVRENİN YARATILIŞI
-# [EN] SECTION 2: THE CREATION OF THE UNIVERSE
+# --- PART 2: THE UNIVERSE'S CONSTITUTION ---
 def setup_universe(pi_str, grid_size_pref=4):
-    if not pi_str: raise ValueError("Pi dizgisi boş.")
-    print("\n--- OMEGA EVRENİ ANAYASASI OLUŞTURULUYOR ---")
+    """
+    Sets up the foundational constitution of the universe. All parameters are
+    derived from non-arbitrary principles, primarily from the constant Pi.
+    """
+    if not pi_str: raise ValueError("Pi string is empty. Cannot initialize universe.")
+    print("\n--- ESTABLISHING THE CONSTITUTION OF THE OMEGA UNIVERSE ---")
+    
     clean_pi_str = ''.join(filter(str.isdigit, pi_str))
     grid_size = grid_size_pref
     total_values_needed = grid_size * grid_size * MV_SIZE
-    if len(clean_pi_str) < total_values_needed: raise ValueError("Pi dizgisi çok kısa!")
+    if len(clean_pi_str) < total_values_needed:
+        raise ValueError("Pi string is too short for the required grid size!")
     
     all_values = np.array([int(d) for d in clean_pi_str[:total_values_needed]])
     normalized_values = (all_values - 4.5) / 4.5
     psi_potential = normalized_values.reshape((grid_size, grid_size, MV_SIZE))
     
-    print("⚖️ Temel Kozmolojik Sabitler Tanımlanıyor...")
+    print("⚖️ Defining Fundamental Cosmological Constants...")
     params = {"grid_size": grid_size}
     
-    # --- TEMEL SABİTLER / FUNDAMENTAL CONSTANTS ---
-    params["g_factor_base"] = np.pi        # [EN] Base strength of the asymmetry engine, derived from Pi. Represents the fundamental drive for complexity.
-    params["k_base"] = np.pi**2            # [EN] Base strength of the origin memory (restoring force), derived from Pi-squared. Represents the imperative to return.
-    params["h_base"] = np.pi               # [EN] Base strength of the stability force (structural integrity), derived from Pi.
+    # --- NON-ARBITRARY PHYSICAL CONSTANTS ---
+    # The foundational strength of the expansion/chaos engine, derived from Pi.
+    params["g_factor_base"] = np.pi
+    # The foundational strength of the 'Origin Memory' force, proportional to the square of Pi.
+    params["k_base"] = np.pi**2
+    # The foundational strength of the stabilizing force.
+    params["h_base"] = np.pi
     
-    # --- İÇSEL HESAPLAMALAR / INTERNAL CALCULATIONS ---
-    g_tuning_factor = np.e / np.pi         # [EN] The "Universal Dialect", a non-arbitrary tuning factor derived from the ratio of e to Pi. It adjusts the raw power of the chaos engine.
+    # --- THE "DIALECT" OF THE UNIVERSE ---
+    # This factor tunes the character of the expansion. Its value is chosen as the ratio
+    # of Euler's number (e, the base of natural growth) to Pi (π, the constant of cycles),
+    # linking the universe's dynamics to the fundamental Euler's Identity (e^(iπ) + 1 = 0).
+    g_tuning_factor = np.e / np.pi
+    params["g_factor"] = params["g_factor_base"] * g_tuning_factor
     
-    params["g_factor"] = params["g_factor_base"] * g_tuning_factor # [EN] The final 'throttle' of the chaos engine, tuned by the Universal Dialect. Its effective value becomes e.
-    
-    # [EN] The dynamic Entropic Limit. The point at which a phase transition occurs, calculated from the ratio of the restoring force to the chaos engine, scaled by Pi.
+    # --- AUTOPOIESIS: A SELF-CALCULATING LIMIT ---
+    # The entropic limit is not an arbitrary number. It is dynamically calculated from the
+    # universe's own constants. It represents the breaking point where the expansive drive
+    # (related to g_factor) overcomes the structural integrity (related to k_base).
     params["max_complexity_threshold"] = np.pi * (params["k_base"] / params["g_factor"])
     
-    print(f"  > Seçilen Lehçe (g_tuning_factor): e/π ≈ {g_tuning_factor:.4f}")
-    print(f"  > Nihai Gaz Pedalı (g_factor): {params['g_factor']:.4f}")
-    print(f"  > Dinamik Entropik Sınır: {params['max_complexity_threshold']:.4f}")
+    print(f"  > Dialect Selected (g_tuning_factor): e/π ≈ {g_tuning_factor:.4f}")
+    print(f"  > Final Expansion Drive (g_factor): {params['g_factor']:.4f}")
+    print(f"  > Dynamic Entropic Limit: {params['max_complexity_threshold']:.4f}")
 
-    # --- SİMÜLASYON PARAMETRELERİ / SIMULATION PARAMETERS ---
-    params["base_dt"] = 0.01 * (1.0 / grid_size)**2 # [EN] The base time step, scaled for numerical stability.
-    params["iterations"] = 500000                  # [EN] The total number of steps for the simulation run.
-    print("--- ANAYASA TAMAMLANDI ---")
+    params["base_dt"] = 0.01 * (1.0 / grid_size)**2
+    params["iterations"] = 500000
+    print("--- CONSTITUTION COMPLETE ---")
     
     return psi_potential, params
 
-# BÖLÜM 3: FİZİK YASALARI
-# [EN] SECTION 3: THE LAWS OF PHYSICS
+# --- PART 3: THE LAWS OF PHYSICS ---
 @jit(nopython=True, parallel=True)
-def calculate_expansion_delta(psi_grid, psi_initial, g_final, h_base):
+def calculate_expansion_delta(psi_grid, psi_initial, g_final, h_final, k_final):
+    """
+    Calculates the change in the state field (Ψ) during the Expansion Phase,
+    using the full, complex set of physical laws.
+    """
     grid_size = psi_grid.shape[0]
     delta_psi = np.zeros_like(psi_grid)
     psi_smoothed = np.zeros_like(psi_grid)
-    
-    # [EN] The weak restoring force for the expansion phase, derived as 1/Pi. Allows the universe to expand without being immediately pulled back.
-    k_final_expansion = (np.pi**2) / (np.pi**3) 
     
     for i in prange(grid_size):
         for j in prange(grid_size):
@@ -92,30 +116,27 @@ def calculate_expansion_delta(psi_grid, psi_initial, g_final, h_base):
         for j in prange(grid_size):
             current, initial, smoothed = psi_grid[i, j], psi_initial[i, j], psi_smoothed[i, j]
             
-            # [EN] Asymmetry Tension: The engine of change, born from the difference between the precise state (current) and its blurred context (smoothed).
+            # The 'Omega Engine': drives complexity by amplifying local differences.
             asymmetry_tension = g_final * (current - smoothed)
-            
-            # [EN] Stability Force ("Soft Wall"): A self-regulating stability term using tanh. Prevents runaways without being explosive like polynomial forces.
-            stability_force = -h_base * (current - np.tanh(current))
-            
-            # [EN] Origin Memory: The weak pull towards the origin during the expansion phase.
-            origin_memory = -k_final_expansion * (current - initial)
+            # The 'Potential Well': a non-linear stabilizing force.
+            stability_force = -h_final * (current - np.tanh(current))
+            # The residual 'Origin Memory' force.
+            origin_memory = -k_final * (current - initial)
             
             delta_psi[i, j] = asymmetry_tension + stability_force + origin_memory
             
     return delta_psi
 
-# --- BÖLÜM 4: SİMÜLASYONUN İCRASI (NİHAİ MÜHÜR) ---
-# [EN] --- SECTION 4: THE EXECUTION OF THE SIMULATION (THE FINAL SEAL) ---
+# --- PART 4: THE SIMULATION ENGINE (THE FINAL SEAL) ---
 try:
     PSI_INITIAL, PARAMS = setup_universe(PI_STR)
     
     psi_current = PSI_INITIAL.copy()
     fark_history, complexity_history = [], []
-    triggered_step = -1       # [EN] A flag that indicates if the Phase Transition has occurred (-1 for No, step number for Yes).
-    dongu_sayaci = 0          # [EN] The cycle counter, tracking the number of completed Eternal Recurrences.
+    triggered_step = -1
+    dongu_sayaci = 0
 
-    print(f"\n--- BENGİ DÖNÜŞ (NİHAİ MÜHÜR) BAŞLATILIYOR ---")
+    print(f"\n--- INITIALIZING ETERNAL RETURN (THE FINAL SEAL) ---")
     start_time = time.time()
     fig, ax = plt.subplots(1, 1, figsize=(10, 10))
     plt.ion()
@@ -123,82 +144,92 @@ try:
     for t in range(PARAMS["iterations"]):
         
         # ==================================================================
-        # ✨ KUSURSUZ TEKRAR KONTROL KAPISI / PERFECT REPETITION CONTROL GATE ✨
+        # ✨ FLAWLESS REPETITION CONTROL GATE (EXECUTED FIRST) ✨
         # ==================================================================
         difference = np.linalg.norm(psi_current - PSI_INITIAL)
         if triggered_step != -1 and difference < 0.01:
             dongu_sayaci += 1
-            print(f"\n ciclo perpetuo ({dongu_sayaci})")
-            print(f"✨✨✨ ADIM {t}: BENGİ DÖNÜŞ TAMAMLANDI! YENİ BİR ÇAĞ BAŞLIYOR! ✨✨✨")
+            print(f"\n>>> ciclo perpetuo ({dongu_sayaci})")
+            print(f"✨✨✨ STEP {t}: ETERNAL RETURN COMPLETE! A NEW AGE BEGINS! ✨✨✨")
             
-            # [EN] Reset the universe to its initial state to begin the next identical cycle.
+            # 1. Reset the universe's state to 'Expansion'.
             triggered_step = -1 
+            # 2. Hard reset the phenomenal state to its pristine, original configuration.
             psi_current = PSI_INITIAL.copy() 
-            
+            # 3. Append placeholder values to history for this reset moment.
             fark_history.append(0.0)
             complexity_history.append(np.var(PSI_INITIAL))
             
-            continue # [EN] Skip the rest of the loop to prevent a "ghost step" after reset.
+            # 4. Crucially, skip the rest of this loop to prevent a "ghost step"
+            #    from contaminating the perfectly reset state.
+            continue
         # ==================================================================
 
+        # Check for phase transition from Expansion to Collapse.
         complexity = np.var(psi_current)
         if triggered_step == -1 and complexity > PARAMS["max_complexity_threshold"]:
-            print(f"\n---!!! ADIM {t}: ✨ ENTROPİK SINIRA ULAŞILDI! FAZ GEÇİŞİ! ✨ !!!---")
+            print(f"\n---!!! STEP {t}: DYNAMIC ENTROPIC LIMIT REACHED! PHASE TRANSITION! ✨ !!!---")
             triggered_step = t
 
-        # --- FAZA ÖZEL FİZİK VE GÜNCELLEME / PHASE-SPECIFIC PHYSICS AND UPDATE ---
-        if triggered_step != -1: # Çöküş Çağı / Collapse Age
-            # [EN] The Pure Law of Return: All complex physics cease. The only imperative is a direct pull towards the origin.
+        # --- PHASE-SPECIFIC PHYSICS AND UPDATE LOGIC ---
+        if triggered_step != -1: # --- COLLAPSE PHASE ---
+            # 1. PHYSICS: The "Homing Beacon" protocol. All complex physics are disabled.
+            # The only active force is a pure, direct attraction to the origin.
             potential_delta = -(psi_current - PSI_INITIAL)
+            
+            # 2. UPDATE: Absolute & Unprotected. The update is applied directly,
+            # without the stabilizing 'conservation law' subtractions.
             max_abs_change = np.max(np.abs(potential_delta))
             if max_abs_change < 1e-9: max_abs_change = 1e-9
             final_dt = PARAMS["base_dt"] / max_abs_change
             psi_current += final_dt * potential_delta
-        else: # Genişleme Çağı / Expansion Age
-            # [EN] The Omega Engine: The strength of the chaos engine is proportional to the current complexity.
+
+        else: # --- EXPANSION PHASE ---
+            # 1. PHYSICS: The complex creation engine is active.
             g_final = PARAMS["g_factor"] * complexity 
-            
+            h_final = PARAMS["h_base"]
+            k_final = PARAMS["k_base"] / (np.pi**3) # Weakened origin memory
             potential_delta = calculate_expansion_delta(
-                psi_current, PSI_INITIAL, g_final, PARAMS["h_base"]
+                psi_current, PSI_INITIAL, g_final, h_final, k_final
             )
             
-            # [EN] Holistic Conservation Law (Σ[∂Ψ/∂t] ≡ 0): Guarantees the total change is zero.
+            # 2. UPDATE: Protected. The state and its change are centered around a zero mean.
+            # This enforces a 'conservation law' that provides stability during chaotic expansion.
             total_change = np.sum(potential_delta, axis=(0, 1))
             num_cells = PARAMS["grid_size"]**2
             average_change = total_change / num_cells
-            final_delta = potential_delta - average_change
+            final_delta = potential_delta - average_change # Protection 1
             
-            # [EN] Intelligent Time: The time step is inversely proportional to the maximum potential change.
             max_abs_change = np.max(np.abs(final_delta))
             if max_abs_change < 1e-9: max_abs_change = 1e-9
             final_dt = PARAMS["base_dt"] / max_abs_change
-            
             psi_current += final_dt * final_delta
             
-            # [EN] Ontological Identity Law (Σ[Ψ] ≡ 0): Guarantees the total state of the universe is zero.
             total_state = np.sum(psi_current, axis=(0, 1))
             average_state = total_state / num_cells
-            psi_current -= average_state
+            psi_current -= average_state # Protection 2
         
+        # Log history for plotting.
         fark_history.append(difference)
         complexity_history.append(complexity)
 
         if np.isnan(difference) or np.isinf(difference):
-            print(f"\n💥 ADIM {t}: PATLAMA (NaN/inf)! 💥"); break
+            print(f"\n💥 STEP {t}: SIMULATION EXPLODED (NaN/inf)! 💥"); break
 
+        # Periodic reporting and visualization.
         if t > 0 and (t % 20000 == 0 or t == PARAMS["iterations"] - 1 or (triggered_step == t)):
-            phase_text = "ÇÖKÜŞ" if triggered_step != -1 else "GENİŞLEME"
-            print(f"Adım: {t:07d}, Döngü: {dongu_sayaci}, Faz: {phase_text}, Fark: {difference:.4f}, Karmaşıklık: {complexity:.4f}, Süre: {(time.time() - start_time):.1f}s")
-            ax.clear(); ax.imshow(psi_current[:, :, 0], cmap='inferno', interpolation='nearest'); ax.set_title(f"Adım: {t} ({phase_text}) - Döngü: {dongu_sayaci}"); plt.draw(); plt.pause(0.01)
+            phase_text = "COLLAPSE" if triggered_step != -1 else "EXPANSION"
+            print(f"Step: {t:07d}, Cycle: {dongu_sayaci}, Phase: {phase_text}, Diff: {difference:.4f}, Complexity: {complexity:.4f}, Time: {(time.time() - start_time):.1f}s")
+            ax.clear(); ax.imshow(psi_current[:, :, 0], cmap='inferno', interpolation='nearest'); ax.set_title(f"Step: {t} ({phase_text}) - Cycle: {dongu_sayaci}"); plt.draw(); plt.pause(0.01)
 
     plt.ioff()
-    print("\n--- SİMÜLASYON SÜRESİ DOLDU ---")
+    print("\n--- SIMULATION DURATION COMPLETE ---")
     fig_final, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 12), sharex=True)
-    fig_final.suptitle("Nihai Mühür: Kusursuz Tekrar Döngüsü", fontsize=20)
-    ax1.plot(fark_history, label='Başlangıçtan Uzaklık (Fark)', color='royalblue')
-    ax2.plot(complexity_history, label='Evrenin Karmaşıklığı (Varyans)', color='orangered')
-    ax1.set_ylabel("Fark"); ax2.set_ylabel("Karmaşıklık"); ax2.set_xlabel("Simülasyon Adımı (t)")
+    fig_final.suptitle("The Final Seal: A Flawlessly Repeating Cycle", fontsize=20)
+    ax1.plot(fark_history, label='Difference from Origin (Norm)', color='royalblue')
+    ax2.plot(complexity_history, label="Universe's Complexity (Variance)", color='orangered')
+    ax1.set_ylabel("Difference"); ax2.set_ylabel("Complexity"); ax2.set_xlabel("Simulation Step (t)")
     ax1.legend(); ax2.legend(); plt.grid(True, alpha=0.3); plt.show()
 
 except Exception as e:
-    print(f"\n❌ BEKLENMEDİK BİR SİMÜLASYON HATASI OLUŞTU: {e}")
+    print(f"\n❌ AN UNEXPECTED SIMULATION ERROR OCCURRED: {e}")
