@@ -146,3 +146,5 @@ Conclusion
 This project set out to answer a single question: can a universe capable of "Eternal Recurrence" be born from a single, non-arbitrary axiom? After a long and iterative journey of computational experiments, the answer is yes.
 
 The "Final Seal" model is not just a piece of code. It is a complete, self-consistent cosmological narrative—a "computational myth" of creation, existence, and rebirth, grounded entirely in first principles. We invite you to run the simulation, observe the cycle, and explore the secrets of this pocket universe.
+
+contact: husmanmert@gmail.com
